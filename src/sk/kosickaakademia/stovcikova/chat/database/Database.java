@@ -23,8 +23,19 @@ public class Database {
     public static void main(String[] args) {
         Database database = new Database();
 
+        List<Message> list = database.getMyMessages("Heni");
+        System.out.println("Your messages: ");
+        if (list.isEmpty()){
+            System.out.println("Do not have anz messages ");
+        }else {
+            for (Message i: list){
+                if (list != null){
+                    System.out.println("ID: " + i.getId() + " Date: " + i.getDt() + " Sender: " + i.getFrom() +
+                            " Receiver: " + i.getTo() + " Text: " + i.getText());
+                }
+            }
+        }
     }
-
 
     //connection method
     public boolean createConnection() {
@@ -60,6 +71,47 @@ public class Database {
         }
         return false;
     }
+    public void printAllUsers(){
+        if(createConnection()){
+            String query = "SELECT * from user";
+            try {
+                PreparedStatement ps = connection.prepareStatement(query);
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    String name = rs.getString("login");
+                    String pas = rs.getString("password");
+                    System.out.println(name + " " + pas);
+                }
+                connection.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }else{
+            System.out.println("Something is wrong");
+        }
+    }
+
+    //users name and password is correct metodh
+    public boolean login(String login, String password){
+        String hash = MD5.getMd5(password);
+        if (createConnection()){
+           String query= "SELECT * from user";
+            try {
+                PreparedStatement ps = connection.prepareStatement(query);
+                ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()){
+                String name = resultSet.getString("login");
+                String pas = resultSet.getString("password");
+               if (name.equals(login) && pas.equals(hash)){
+                   return true;
+               }
+            }
+            connection.close();
+        } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+        return false;
 
     //changing password method
     public boolean changePassword(String oldPassword, String userName, String newPassword) {
@@ -81,7 +133,7 @@ public class Database {
         }
         return false;
     }
-    
+
     public boolean sendMessage(int from, String toUser, String text){
         if(text==null || text.equals(""))
             return false;
@@ -111,7 +163,7 @@ public class Database {
 
 
 
-    private int getUserId(String login) {
+    private int getUserId(String login){
         if (login.equals("")){
             return  -1;
         }
@@ -184,5 +236,8 @@ public class Database {
         }
     }
 }
+
+
+    }
 
 
