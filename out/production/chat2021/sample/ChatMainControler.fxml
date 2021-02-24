@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane opacity="0.48" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.ChatMainController">
+   <children>
+      <Label fx:id="meno" layoutX="52.0" layoutY="21.0" prefHeight="27.0" prefWidth="113.0" text="User:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="sprava" layoutX="93.0" layoutY="344.0" prefHeight="39.0" prefWidth="365.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </TextField>
+      <Button layoutX="490.0" layoutY="344.0" mnemonicParsing="false" onAction="#posliSpravu" text="Send">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Line endX="313.20001220703125" layoutX="128.0" layoutY="274.0" startX="-31.800003051757812" />
+      <TextArea fx:id="list_of_messages" layoutX="93.0" layoutY="55.0" prefHeight="200.0" prefWidth="354.0" />
+      <Label fx:id="logoutLabel" layoutX="526.0" layoutY="21.0" onMouseClicked="#odhlasMa" text="Logout">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <TextArea layoutX="454.0" layoutY="55.0" prefHeight="200.0" prefWidth="122.0" />
+      <Label layoutX="92.0" layoutY="255.0" text="Your messeges:" />
+      <Button fx:id="button_Refresh" accessibleRole="COMBO_BOX" layoutX="14.0" layoutY="135.0" mnemonicParsing="false" onAction="#zobrazSpravy" prefHeight="39.0" prefWidth="64.0" text="Refresh" textOverrun="CENTER_ELLIPSIS" />
+      <Label layoutX="454.0" layoutY="255.0" text="Users:" />
+      <Line endX="83.20001220703125" layoutX="489.0" layoutY="274.0" startX="-27.79998779296875" />
+      <Label layoutX="46.0" layoutY="304.0" text="From:" />
+      <Label layoutX="36.0" layoutY="355.0" text="Message:" />
+      <ComboBox fx:id="comboBox" layoutX="91.0" layoutY="300.0" prefWidth="150.0" />
+      <Button layoutX="256.0" layoutY="293.0" mnemonicParsing="false" onAction="#addSmile" prefHeight="39.0" prefWidth="50.0" text="⛄">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

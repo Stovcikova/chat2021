@@ -15,42 +15,31 @@ public class Database {
 
     private Connection connection;
     private String login = "Heni";
-    private String password = "1111111111";
-
-
+    private String password = "visma2021";
 
 
     public static void main(String[] args) {
         Database database = new Database();
+       database.insertNewUser();
 
-        List<Message> list = database.getMyMessages("Heni");
-        System.out.println("Your messages: ");
-        if (list.isEmpty()){
-            System.out.println("Do not have anz messages ");
-        }else {
-            for (Message i: list){
-                if (list != null){
-                    System.out.println("ID: " + i.getId() + " Date: " + i.getDt() + " Sender: " + i.getFrom() +
-                            " Receiver: " + i.getTo() + " Text: " + i.getText());
-                }
-            }
-        }
+
     }
-
-    //connection method
-    public boolean createConnection() {
+    public boolean createConnection(){
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(url, nameDatabase, passwordDatabase);
-            if (connection != null) {
+            connection = DriverManager.getConnection("jdbc:mysql://itsovy.sk:3306/chat2021","mysqluser", "Kosice2021!");
+            if(connection != null){
                 return true;
             }
-
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
         return false;
     }
+
+
 
     //creating new users
     public boolean insertNewUser() {
@@ -71,13 +60,14 @@ public class Database {
         }
         return false;
     }
-    public void printAllUsers(){
-        if(createConnection()){
+
+    public void printAllUsers() {
+        if (createConnection()) {
             String query = "SELECT * from user";
             try {
                 PreparedStatement ps = connection.prepareStatement(query);
                 ResultSet rs = ps.executeQuery();
-                while(rs.next()){
+                while (rs.next()) {
                     String name = rs.getString("login");
                     String pas = rs.getString("password");
                     System.out.println(name + " " + pas);
@@ -86,54 +76,35 @@ public class Database {
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
-        }else{
+        } else {
             System.out.println("Something is wrong");
         }
     }
 
     //users name and password is correct metodh
-    public boolean login(String login, String password){
+    public boolean login(String login, String password) {
         String hash = MD5.getMd5(password);
-        if (createConnection()){
-           String query= "SELECT * from user";
+        if (createConnection()) {
+            String query = "SELECT * from user";
             try {
                 PreparedStatement ps = connection.prepareStatement(query);
                 ResultSet resultSet = ps.executeQuery();
-            while (resultSet.next()){
-                String name = resultSet.getString("login");
-                String pas = resultSet.getString("password");
-               if (name.equals(login) && pas.equals(hash)){
-                   return true;
-               }
-            }
-            connection.close();
-        } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        }
-        return false;
-
-    //changing password method
-    public boolean changePassword(String oldPassword, String userName, String newPassword) {
-        if (createConnection()) {
-            String query = "UPDATE user SET password = ? WHERE login = ? AND password = ?";
-            try {
-                PreparedStatement ps = connection.prepareStatement(query);
-                ps.setString(1, MD5.getMd5(newPassword));
-                ps.setString(2, userName);
-                ps.setString(3, MD5.getMd5(oldPassword));
-                int result = ps.executeUpdate();
-                System.out.println(result);
+                while (resultSet.next()) {
+                    String name = resultSet.getString("login");
+                    String pas = resultSet.getString("password");
+                    if (name.equals(login) && pas.equals(hash)) {
+                        return true;
+                    }
+                }
                 connection.close();
-                return true;
-
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
         }
         return false;
-    }
 
+
+    }
     public boolean sendMessage(int from, String toUser, String text){
         if(text==null || text.equals(""))
             return false;
@@ -161,83 +132,117 @@ public class Database {
         return false;
     }
 
-
-
-    private int getUserId(String login){
-        if (login.equals("")){
-            return  -1;
+    public int getUserId(String login){
+        if(login.equals("")){
+            return -1;
         }
-        String query = "SELECT user.id FROM user WHERE login LIKE ?";
-        if (createConnection()){
+        String query = "SELECT user.id from user where login like ?";
+
+        if(createConnection()){
             try {
                 PreparedStatement ps = connection.prepareStatement(query);
                 ps.setString(1, login);
-                ResultSet rs= ps.executeQuery();
-                if (rs.next()){
-                    int identifier = rs.getInt("id");
-                    return identifier;
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()){
+                    int idecko = rs.getInt("id");
+                    //System.out.println("id" + idecko);
+                    return idecko;
                 }
                 connection.close();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
         }else{
-            System.out.println("wrong");
+            System.out.println("Something is wrong");
         }
         return -1;
     }
-    public List<Message> getMyMessages(String login) {
-        if (login.equals("")){
+    public List<Message> getMyMessages(String login){
+
+        if(login.equals("")){
             return null;
         }
-        List<Message> list= new ArrayList<>();
-        if (createConnection()){
-            String query = "SELECT message.id, message.dt, message.fromUser, message.toUser, message.text"+
-                    "user.login AS sender FROM message INNER JOIN user ON user.id = message.fromUser"+
-                    "WHERE toUser = ?";
+
+        List<Message> list = new ArrayList<>();
+
+        if(createConnection()){
+            String query = "SELECT message.id, message.dt, message.fromUser, message.toUser, message.text, " +
+                    " user.login AS Sender FROM message INNER JOIN user ON user.id = message.fromUser " +
+                    " WHERE toUser = ?";
+            //System.out.println(query);
             try {
                 PreparedStatement ps = connection.prepareStatement(query);
-                ps.setInt(1, getUserId(login));
+                ps.setInt(1,getUserId(login));
+                //System.out.println(ps);
                 ResultSet rs = ps.executeQuery();
-                while (rs.next()){
-                    int identifier = rs.getInt("id");
+                while(rs.next()){
+                    int id = rs.getInt("id");
                     Date date = rs.getDate("dt");
-                    String fromUser = rs.getString("sender");
-                    int toUser= rs.getInt("toUser");
-                    String text= rs.getString("text");
-                    Message message= new Message(identifier, fromUser, login, date, text);
+                    String fromUser = rs.getString("Sender");
+                    int toUser = rs.getInt("toUser");
+                    String text = rs.getString("text");
+                    Timestamp timestamp = rs.getTimestamp("dt");
+                    //System.out.println(timestamp);
+                    Date date1 = new Date(timestamp.getTime());
+                    //System.out.println(id + " " + date + " " + fromUser +" " + login + " " + text);
+                    Message message = new Message(id, fromUser, login, date1, text);
                     list.add(message);
                 }
                 connection.close();
+                // volame metodu deleteAllMyMessages
+                deleteMyMessages(login);
                 return list;
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
-        }else {
-            System.out.println("wrong");
+        }else{
+            System.out.println("Something is wrong");
         }
-        return  null;
+
+        return null;
     }
-    public void deleteALLMyMessages(String login){
-        if (login.equals("")){
+    public void deleteMyMessages(String login){
+        if(login.equals("")){
             System.out.println("Write your login");
             return;
         }
-        if (createConnection()){
-            String query= "DELETE FROM message WHERE toUser = ?";
+
+        if(createConnection()){
+            String query = "DELETE FROM message WHERE toUser = ?";
             try {
                 PreparedStatement ps = connection.prepareStatement(query);
                 ps.setInt(1, getUserId(login));
                 int result = ps.executeUpdate();
+                System.out.println(result);
                 connection.close();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
         }
     }
-}
 
-
+    //all users
+    public List<String> AllUsers(){
+        List<String> list = new ArrayList<>();
+        if(createConnection()){
+            String query = "SELECT login from user";
+            try {
+                PreparedStatement ps = connection.prepareStatement(query);
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    String name = rs.getString("login");
+                    list.add(name);
+                }
+                connection.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }else{
+            System.out.println("Something is wrong");
+        }
+        return list;
     }
+
+}
 
 
